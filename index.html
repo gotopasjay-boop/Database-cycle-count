@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cycle Count Ultra Pro</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary: #6366f1;
+        --accent: #22d3ee;
+        --bg-dark: #020617;
+        --card: rgba(255, 255, 255, 0.06);
+        --border: rgba(255, 255, 255, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background: radial-gradient(circle at top, #0f172a, #020617);
+        color: #e5e7eb;
+      }
+
+      /* NAVBAR */
+      .navbar {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 10px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        backdrop-filter: blur(20px);
+        background: rgba(2, 6, 23, 0.7);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .navbar button {
+        background: transparent;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 999px;
+        color: #94a3b8;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .navbar button.active {
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: white;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+      }
+
+      /* CONTAINER */
+      .container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 35px;
+        border-radius: 20px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(25px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 700;
+        background: linear-gradient(to right, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* INPUT */
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      label {
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
+
+      input {
+        width: 100%;
+        padding: 13px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: white;
+        margin-top: 6px;
+        transition: 0.25s;
+      }
+
+      input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.3);
+      }
+
+      /* BUTTON */
+      .main-btn {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 10px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: white;
+        transition: 0.3s;
+      }
+
+      .main-btn.secondary {
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      }
+
+      .main-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .main-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+      }
+
+      /* INFO BOX */
+      #info-box {
+        display: none;
+        padding: 20px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        margin-bottom: 20px;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      /* TABLE */
+      .table-container {
+        margin-top: 20px;
+        border-radius: 14px;
+        overflow: hidden;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: center;
+      }
+
+      th {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      tr:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      /* BADGE */
+      .badge {
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        display: inline-block;
+      }
+
+      .badge-master {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+      }
+
+      .badge-manual {
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      }
+
+      /* STATUS */
+      #status-msg {
+        text-align: center;
+        margin-top: 15px;
+        font-weight: 600;
+        height: 24px;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-dl {
+        flex: 1;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        color: white;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.3s;
+      }
+
+      .btn-dl:hover {
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar">
+      <button class="tablinks" onclick="openTab(event, 'InputTab')" id="defaultOpen">
+        INPUT
+      </button>
+      <button class="tablinks" onclick="openTab(event, 'LaporanTab')">LAPORAN</button>
+    </div>
+
+    <div id="InputTab" class="container tabcontent">
+      <h2>Cycle Count System</h2>
+
+      <div id="info-box">
+        <div class="info-row">
+          <span>Nama</span><span id="disp-nama">-</span>
+        </div>
+        <div class="info-row">
+          <span>Lokasi</span><span id="disp-lokasi">-</span>
+        </div>
+        <div class="info-row">
+          <span>Stok</span><span id="disp-stok">0</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>SKU</label>
+        <input type="text" id="input-sku" />
+      </div>
+
+      <div class="form-group">
+        <label>Petugas</label>
+        <input type="text" id="input-user" />
+      </div>
+
+      <div class="form-group">
+        <label>Qty Aktual</label>
+        <input type="number" id="input-aktual" />
+      </div>
+
+      <button id="btn-check" class="main-btn secondary" onclick="checkItem()">
+        CEK
+      </button>
+      <button id="btn-submit" class="main-btn" onclick="submitData()" disabled>
+        SIMPAN
+      </button>
+
+      <div id="status-msg"></div>
+    </div>
+
+    <div id="LaporanTab" class="container tabcontent" style="display:none;">
+      <h2>Laporan Data</h2>
+
+      <div class="btn-group">
+        <a id="link-pdf" class="btn-dl" style="background: #ef4444" href="#" onclick="alert('Fitur PDF belum tersedia'); return false;">PDF</a>
+        <a id="link-xlsx" class="btn-dl" style="background: #10b981" href="#" onclick="alert('Fitur Excel belum tersedia'); return false;">EXCEL</a>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>SKU</th>
+              <th>Nama</th>
+              <th>Lokasi</th>
+              <th>Sistem</th>
+              <th>Aktual</th>
+              <th>Selisih</th>
+              <th>Petugas</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="9" style="text-align:center">Tidak ada data</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      let activeItem = null;
+      let dataEntries = [];
+
+      // Tab switching function
+      function openTab(evt, tabName) {
+        document.querySelectorAll(".tabcontent").forEach((t) => (t.style.display = "none"));
+        document
+          .querySelectorAll(".tablinks")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.classList.add("active");
+
+        if (tabName === "LaporanTab") {
+          loadLaporan();
+        }
+      }
+
+      document.getElementById("defaultOpen").click();
+
+      // Dummy function to simulate item checking
+      function checkItem() {
+        const sku = document.getElementById("input-sku").value.trim();
+        const user = document.getElementById("input-user").value.trim();
+
+        if (!sku || !user) {
+          setStatus("SKU dan Petugas wajib diisi!", true);
+          resetInfoBox();
+          disableSubmit(true);
+          return;
+        }
+
+        // Simulate fetching item details from SKU
+        // Dummy data:
+        const items = {
+          ABC001: { nama: "Item A", lokasi: "Gudang 1", stok: 150 },
+          BCD002: { nama: "Item B", lokasi: "Gudang 2", stok: 75 },
+          CDE003: { nama: "Item C", lokasi: "Gudang 3", stok: 200 },
+        };
+
+        if (sku in items) {
+          const item = items[sku];
+          document.getElementById("disp-nama").textContent = item.nama;
+          document.getElementById("disp-lokasi").textContent = item.lokasi;
+          document.getElementById("disp-stok").textContent = item.stok;
+          document.getElementById("info-box").style.display = "block";
+          activeItem = item; // Save active item details for submission
+          setStatus("Item ditemukan. Masukkan Qty Aktual dan simpan.", false);
+          disableSubmit(false);
+        } else {
+          setStatus("SKU tidak ditemukan!", true);
+          resetInfoBox();
+          disableSubmit(true);
+          activeItem = null;
+        }
+      }
+
+      // Reset info box
+      function resetInfoBox() {
+        document.getElementById("disp-nama").textContent = "-";
+        document.getElementById("disp-lokasi").textContent = "-";
+        document.getElementById("disp-stok").textContent = "0";
+        document.getElementById("info-box").style.display = "none";
+      }
+
+      // Enable / disable SIMPAN button
+      function disableSubmit(flag) {
+        document.getElementById("btn-submit").disabled = flag;
+      }
+
+      // Set status message
+      function setStatus(msg, isError) {
+        const status = document.getElementById("status-msg");
+        status.textContent = msg;
+        status.style.color = isError ? "#ef4444" : "#22d3ee"; // red or cyan
+      }
+
+      // Submit data
+      function submitData() {
+        const qtyActual = Number(document.getElementById("input-aktual").value);
+        const petugas = document.getElementById("input-user").value.trim();
+        const sku = document.getElementById("input-sku").value.trim();
+
+        if (!activeItem) {
+          setStatus("Tidak ada data item aktif. Harap cek SKU terlebih dahulu.", true);
+          return;
+        }
+        if (!qtyActual || qtyActual < 0 || isNaN(qtyActual)) {
+          setStatus("Qty Aktual harus berupa angka positif.", true);
+          return;
+        }
+        if (!petugas) {
+          setStatus("Petugas wajib diisi!", true);
+          return;
+        }
+
+        // Calculate selisih (stock - actual)
+        const selisih = activeItem.stok - qtyActual;
+        // Build status badge
+        const statusLabel = selisih === 0 ? "Master" : "Manual";
+
+        // Current time
+        const now = new Date();
+        const waktu = now.toLocaleString();
+
+        // Save entry
+        const entry = {
+          waktu,
+          sku,
+          nama: activeItem.nama,
+          lokasi: activeItem.lokasi,
+          sistem: activeItem.stok,
+          aktual: qtyActual,
+          selisih,
+          petugas,
+          status: statusLabel,
+        };
+
+        dataEntries.push(entry);
+
+        setStatus("Data berhasil disimpan.", false);
+
+        // Reset form
+        resetInfoBox();
+        disableSubmit(true);
+        document.getElementById("input-sku").value = "";
+        document.getElementById("input-aktual").value = "";
+        document.getElementById("input-user").value = "";
+
+        activeItem = null;
+      }
+
+      // Load laporan data to table
+      function loadLaporan() {
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = ""; // Clear
+
+        if (dataEntries.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="9" style="text-align:center">Tidak ada data</td></tr>';
+          return;
+        }
+
+        dataEntries.forEach((entry) => {
+          const tr = document.createElement("tr");
+
+          tr.innerHTML = `
+            <td>${entry.waktu}</td>
+            <td>${entry.sku}</td>
+            <td>${entry.nama}</td>
+            <td>${entry.lokasi}</td>
+            <td>${entry.sistem}</td>
+            <td>${entry.aktual}</td>
+            <td>${entry.selisih}</td>
+            <td>${entry.petugas}</td>
+            <td><span class="badge ${entry.status === "Master" ? "badge-master" : "badge-manual"}">${entry.status}</span></td>
+          `;
+
+          tbody.appendChild(tr);
+        });
+      }
+    </script>
+  </body>
+</html>
+Penjelasan singkat:
+
+Fungsi checkItem() mencari SKU pada data dummy yang sudah disediakan, tampilkan info dan aktifkan tombol simpan.
+Fungsi submitData() menyimpan data input ke array dataEntries.
+Fungsi loadLaporan() menampilkan isi dataEntries pada tabel laporan.
+Tombol export PDF/XLSX saat ini hanya memunculkan alert karena belum tersedia.
+Silakan coba di OneCompiler, fitur dasar sudah bisa berjalan. Kalau butuh fitur tambahan, tinggal beri tahu ya!
+
+>
+buatkan index html sesuai dengan script js 
+
+Berikut index.html yang disesuaikan agar dapat berfungsi dengan backend Google Apps Script Anda (fungsi saveCount, saveManualEntry, searchItem, getLogData, dll):
+
+Menggunakan google.script.run untuk komunikasi dengan server.
+Fitur cek SKU memanggil searchItem server.
+Simpan data panggil saveCount jika ketemu master, atau saveManualEntry jika tidak.
+Tampilkan laporan dari getLogData.
+Tombol export unduhan akan membuka URL export dari backend (panggil getDownloadUrls).
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cycle Count Ultra Pro</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #6366f1;
+        --accent: #22d3ee;
+        --bg-dark: #020617;
+        --card: rgba(255, 255, 255, 0.06);
+        --border: rgba(255, 255, 255, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background: radial-gradient(circle at top, #0f172a, #020617);
+        color: #e5e7eb;
+      }
+
+      .navbar {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 10px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        backdrop-filter: blur(20px);
+        background: rgba(2, 6, 23, 0.7);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .navbar button {
+        background: transparent;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 999px;
+        color: #94a3b8;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .navbar button.active {
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: white;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 35px;
+        border-radius: 20px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(25px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 700;
+        background: linear-gradient(to right, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      label {
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
+
+      input {
+        width: 100%;
+        padding: 13px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: white;
+        margin-top: 6px;
+        transition: 0.25s;
+      }
+
+      input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.3);
+      }
+
+      .main-btn {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 10px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: white;
+        transition: 0.3s;
+      }
+
+      .main-btn.secondary {
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      }
+
+      .main-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .main-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+      }
+
+      #info-box {
+        display: none;
+        padding: 20px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        margin-bottom: 20px;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .table-container {
+        margin-top: 20px;
+        border-radius: 14px;
+        overflow: hidden;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: center;
+      }
+
+      th {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      tr:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .badge {
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        display: inline-block;
+      }
+
+      .badge-master {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+      }
+
+      .badge-manual {
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: black;
+      }
+
+      #status-msg {
+        text-align: center;
+        margin-top: 15px;
+        font-weight: 600;
+        min-height: 24px;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .btn-dl {
+        flex: 1;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        color: white;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.3s;
+        user-select: none;
+      }
+
+      .btn-dl:hover {
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar">
+      <button class="tablinks" onclick="openTab(event, 'InputTab')" id="defaultOpen">INPUT</button>
+      <button class="tablinks" onclick="openTab(event, 'LaporanTab')">LAPORAN</button>
+    </div>
+
+    <div id="InputTab" class="container tabcontent">
+      <h2>Cycle Count System</h2>
+
+      <div id="info-box">
+        <div class="info-row">
+          <span>Nama</span><span id="disp-nama">-</span>
+        </div>
+        <div class="info-row">
+          <span>Lokasi</span><span id="disp-lokasi">-</span>
+        </div>
+        <div class="info-row">
+          <span>Stok Sistem</span><span id="disp-stok">0</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>SKU</label>
+        <input type="text" id="input-sku" autocomplete="off" />
+      </div>
+
+      <div class="form-group">
+        <label>Petugas</label>
+        <input type="text" id="input-user" autocomplete="off" />
+      </div>
+
+      <div class="form-group">
+        <label>Qty Aktual</label>
+        <input type="number" id="input-aktual" min="0" />
+      </div>
+
+      <button id="btn-check" class="main-btn secondary" onclick="checkItem()">
+        CEK
+      </button>
+      <button id="btn-submit" class="main-btn" onclick="submitData()" disabled>
+        SIMPAN
+      </button>
+
+      <div id="status-msg"></div>
+    </div>
+
+    <div id="LaporanTab" class="container tabcontent" style="display:none;">
+      <h2>Laporan Data</h2>
+
+      <div class="btn-group">
+        <a id="link-pdf" class="btn-dl" style="background: #ef4444" href="#" target="_blank" rel="noopener noreferrer">PDF</a>
+        <a id="link-xlsx" class="btn-dl" style="background: #10b981" href="#" target="_blank" rel="noopener noreferrer">EXCEL</a>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>SKU</th>
+              <th>Nama</th>
+              <th>Lokasi</th>
+              <th>Sistem</th>
+              <th>Aktual</th>
+              <th>Selisih</th>
+              <th>Petugas</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="9" style="text-align:center">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      let currentItem = null; // Store item info from search
+      let reportData = [];
+
+      function openTab(evt, tabName) {
+        document.querySelectorAll(".tabcontent").forEach((t) => (t.style.display = "none"));
+        document.querySelectorAll(".tablinks").forEach((btn) => btn.classList.remove("active"));
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.classList.add("active");
+
+        if (tabName === "LaporanTab") {
+          loadLaporan();
+          loadDownloadLinks();
+        }
+      }
+
+      document.getElementById("defaultOpen").click();
+
+      function resetInfoBox() {
+        currentItem = null;
+        document.getElementById("disp-nama").textContent = "-";
+        document.getElementById("disp-lokasi").textContent = "-";
+        document.getElementById("disp-stok").textContent = "0";
+        document.getElementById("info-box").style.display = "none";
+        disableSubmit(true);
+      }
+
+      function disableSubmit(state) {
+        document.getElementById("btn-submit").disabled = state;
+      }
+
+      function setStatus(msg, isError = false) {
+        const status = document.getElementById("status-msg");
+        status.textContent = msg;
+        status.style.color = isError ? "#ef4444" : "#22d3ee"; // Red or cyan
+      }
+
+      function checkItem() {
+        const sku = document.getElementById("input-sku").value.trim();
+        if (!sku) {
+          setStatus("SKU harus diisi!", true);
+          resetInfoBox();
+          return;
+        }
+
+        setStatus("Mencari SKU...");
+
+        google.script.run.withSuccessHandler((res) => {
+          if (res.status === "found") {
+            currentItem = res;
+            document.getElementById("disp-nama").textContent = res.nama;
+            document.getElementById("disp-lokasi").textContent = res.lokasi;
+            document.getElementById("disp-stok").textContent = res.stokSistem;
+            document.getElementById("info-box").style.display = "block";
+            setStatus("Item ditemukan. Masukkan Qty Aktual dan simpan.");
+            disableSubmit(false);
+          } else if (res.status === "not_found") {
+            currentItem = null;
+            setStatus(
+              "SKU tidak ditemukan di Master. Input manual aktif. Masukkan Nama, Lokasi, Stok Sistem lalu Qty Aktual.",
+              false
+            );
+            document.getElementById("info-box").style.display = "block";
+            // Clear info fields to editable for manual input
+            document.getElementById("disp-nama").textContent = "";
+            document.getElementById("disp-lokasi").textContent = "";
+            document.getElementById("disp-stok").textContent = "0";
+            disableSubmit(false);
+          } else {
+            setStatus("Terjadi kesalahan saat pencarian SKU.", true);
+            resetInfoBox();
+          }
+        }).searchItem(sku);
+      }
+
+      function submitData() {
+        const sku = document.getElementById("input-sku").value.trim();
+        let nama = currentItem ? currentItem.nama : document.getElementById("disp-nama").textContent.trim();
+        if (!nama) {
+          nama = prompt("Masukkan Nama Barang:");
+          if (!nama) {
+            setStatus("Nama barang wajib diisi untuk input manual.", true);
+            return;
+          }
+        }
+
+        let lokasi = currentItem ? currentItem.lokasi : document.getElementById("disp-lokasi").textContent.trim();
+        if (!lokasi) {
+          lokasi = prompt("Masukkan Lokasi Barang:") || "";
+        }
+
+        const stokSistemStr = currentItem ? currentItem.stokSistem : document.getElementById("disp-stok").textContent.trim();
+        const stokSistem = Number(stokSistemStr) || 0;
+
+        const qtyAktualStr = document.getElementById("input-aktual").value.trim();
+        const qtyAktual = Number(qtyAktualStr);
+        if (!qtyAktualStr || isNaN(qtyAktual) || qtyAktual < 0) {
+          setStatus("Qty Aktual harus angka ≥ 0!", true);
+          return;
+        }
+
+        const petugas = document.getElementById("input-user").value.trim();
+        if (!petugas) {
+          setStatus("Petugas harus diisi!", true);
+          return;
+        }
+
+        setStatus("Menyimpan data...");
+
+        if (currentItem) {
+          // Master item
+          google.script.run
+            .withSuccessHandler((msg) => {
+              setStatus(msg, msg.toLowerCase().includes("error"));
+              clearForm();
+            })
+            .saveCount(sku, qtyAktual, petugas);
+        } else {
+          // Manual input
+          google.script.run
+            .withSuccessHandler((msg) => {
+              setStatus(msg, msg.toLowerCase().includes("error"));
+              clearForm();
+            })
+            .saveManualEntry(sku, nama, lokasi, stokSistem, qtyAktual, petugas);
+        }
+      }
+
+      function clearForm() {
+        resetInfoBox();
+        document.getElementById("input-sku").value = "";
+        document.getElementById("input-user").value = "";
+        document.getElementById("input-aktual").value = "";
+      }
+
+      function loadLaporan() {
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center">Memuat data...</td></tr>';
+
+        google.script.run.withSuccessHandler((data) => {
+          tbody.innerHTML = "";
+          if (!data || data.length < 2) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center">Tidak ada data.</td></tr>';
+            return;
+          }
+
+          // Skip header row
+          for (let i = 1; i < data.length; i++) {
+            const row = data[i];
+            const waktu = new Date(row[0]).toLocaleString();
+            const sku = row[1];
+            const nama = row[2];
+            const lokasi = row[3];
+            const sistem = row[4];
+            const aktual = row[5];
+            const selisih = row[6];
+            const petugas = row[7];
+            const status = row[8]; // MASTER or MANUAL
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${waktu}</td>
+              <td>${sku}</td>
+              <td>${nama}</td>
+              <td>${lokasi}</td>
+              <td>${sistem}</td>
+              <td>${aktual}</td>
+              <td>${selisih}</td>
+              <td>${petugas}</td>
+              <td><span class="badge ${
+                status === "MASTER" ? "badge-master" : "badge-manual"
+              }">${status}</span></td>
+            `;
+            tbody.appendChild(tr);
+          }
+        }).getLogData();
+      }
+
+      function loadDownloadLinks() {
+        google.script.run.withSuccessHandler((urls) => {
+          if (urls) {
+            document.getElementById("link-pdf").href = urls.pdf;
+            document.getElementById("link-xlsx").href = urls.excel;
+          }
+        }).getDownloadUrls();
+      }
+    </script>
+  </body>
+</html>
